@@ -4,12 +4,13 @@
 # counties via 5-digit FIPS codes. Color intensity (light to dark red) reflects
 # poverty rate — darker counties have higher poverty. County borders are drawn
 # in white for visual separation. Map is zoomed to NC's actual lat/lon bounds
-# so the full US base map is hidden and NC fills the frame. The slight east-west
-# tilt is geographically accurate — NC's western edge sits ~1 degree south of
-# its eastern edge in real coordinates.
+# so the full US base map is hidden and NC fills the frame. 
 
+import streamlit as st
 import plotly.express as px
 import pandas as pd
+
+st.title("NC County Poverty Map")
 
 # Load the cleaned NC poverty dataset
 df = pd.read_excel("data/nc_poverty_clean.xlsx")
@@ -48,4 +49,4 @@ fig.update_layout(
     title_x=0.5,
 )
 
-fig.show()
+st.plotly_chart(fig, width="stretch")

@@ -6,16 +6,20 @@
 # saves to data/nc_poverty_trends.csv. On subsequent runs, loads from the saved
 # CSV to avoid redundant Census requests. Produces four charts: statewide trend,
 # multi-county comparison, racial disparity bar chart, and a child vs. overall
-# poverty scatter plot — all using real Census SAIPE data.
+# poverty scatter plot 
 
+import streamlit as st
 import pandas as pd
 import plotly.express as px
 import urllib.request
 import os
 
+st.title("Poverty Trends (2015-2024)")
+
 # ── Configuration ─────────────────────────────────────────────────────────────
 YEARS = range(2015, 2025)          # 2015 through 2024 inclusive
 TRENDS_CACHE = "data/nc_poverty_trends.csv"  # saved after first download
+HIGHLIGHT_COUNTIES = ["Cumberland", "Robeson", "Wake", "Mecklenburg", "Union"]
 
 # Fixed-width column positions from Census SAIPE README.TXT (0-indexed)
 COLSPECS = [
@@ -64,7 +68,7 @@ def fetch_saipe_year(year):
 
     return df
 
-
+@st.cache_data
 def load_trends():
     """Load trends data from cache if available, otherwise download all years."""
     if os.path.exists(TRENDS_CACHE):
@@ -118,36 +122,19 @@ fig1 = px.line(
     },
 )
 fig1.update_layout(title_x=0.5)
-fig1.show()
+
 
 # ── Chart 2: Multi-county trend comparison ────────────────────────────────────
 # Compares selected counties over time — edit list to highlight any counties
-HIGHLIGHT_COUNTIES = ["Cumberland", "Robeson", "Wake", "Mecklenburg", "Union"]
+# Moved inside the tab because it depends to user input
 
-county_trends = trends[trends["county"].isin(HIGHLIGHT_COUNTIES)]
-
-fig2 = px.line(
-    county_trends,
-    x="year",
-    y="poverty_all_pct",
-    color="county",
-    title="Poverty Rate Trend by County (2015–2024)",
-    labels={
-        "year":            "Year",
-        "poverty_all_pct": "Poverty Rate (%)",
-        "county":          "County",
-    },
-    markers=True,
-)
-fig2.update_layout(title_x=0.5)
-fig2.show()
 
 # ── Chart 3: Racial disparity bar chart ──────────────────────────────────────
 # Statewide racial poverty rates — sourced from ACS 2024 (not in SAIPE)
-# SAIPE does not publish racial breakdowns at county level; ACS is the source
+# Source: https://data.census.gov/table/ACSST1Y2024.S1701?g=040XX00US37
 racial_data = pd.DataFrame({
-    "Race/Ethnicity": ["White", "Black", "Latino", "American Indian", "Asian"],
-    "poverty_rate":   [9.1, 18.9, 20.2, 17.1, 8.5],  # ACS 2024, NC statewide
+    "Race/Ethnicity": ["White", "Black", "Latino", "Native American", "Asian"],
+    "poverty_rate":   [9.3, 18.9, 20.2, 17.1, 8.5],  # ACS 2024, NC statewide
 })
 
 fig3 = px.bar(
@@ -160,7 +147,7 @@ fig3 = px.bar(
     color_continuous_scale="Reds",
 )
 fig3.update_layout(title_x=0.5)
-fig3.show()
+
 
 # ── Chart 4: Child vs. overall poverty scatter (most recent year) ─────────────
 # Each dot is one county — shows that child poverty exceeds overall poverty
@@ -178,4 +165,44 @@ fig4 = px.scatter(
 )
 fig4.update_traces(textposition="top center", textfont_size=8)
 fig4.update_layout(title_x=0.5)
-fig4.show()
+
+
+# This replaces the four fig.show() calls and displays the figures in tabs:
+
+tab1, tab2, tab3, tab4 = st.tabs([
+    "Statewide Trend",
+    "County Comparison", 
+    "Racial Disparities",
+    "Child vs Overall Poverty",
+])
+
+with tab1:
+    st.plotly_chart(fig1, width="stretch")
+
+with tab2:
+    # Allow user to pick which counties to compare
+    all_counties = sorted(trends["county"].unique().tolist())
+    selected = st.multiselect(
+        "Select counties to compare",
+        options=all_counties,
+        default=HIGHLIGHT_COUNTIES,
+    )
+    # Filter and redraw based on selection
+    county_trends = trends[trends["county"].isin(selected)]
+    fig2 = px.line(
+        county_trends,
+        x="year",
+        y="poverty_all_pct",
+        color="county",
+        title="Poverty Rate Trend by County (2015–2024)",
+        labels={"year": "Year", "poverty_all_pct": "Poverty Rate (%)", "county": "County"},
+        markers=True,
+    )
+    fig2.update_layout(title_x=0.5)
+    st.plotly_chart(fig2, width="stretch")
+
+with tab3:
+    st.plotly_chart(fig3, width="stretch")
+
+with tab4:
+    st.plotly_chart(fig4, width="stretch")
