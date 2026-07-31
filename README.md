@@ -5,7 +5,7 @@ inequality across all 100 counties of North Carolina, built with real
 Census Bureau and USDA data.
 
 ## 🔗 Live Dashboard
-https://nc-poverty-dashboard-magmil.streamlit.app
+[nc-poverty-dashboard-magmil.streamlit.app](https://nc-poverty-dashboard-magmil.streamlit.app)
 
 **GitHub:** github.com/milamaggie12-ui/nc-poverty-dashboard
 
