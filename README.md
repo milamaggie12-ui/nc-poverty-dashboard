@@ -138,8 +138,8 @@ nc-poverty-dashboard/
 ## Author
 
 **Magdalena Milanova**
-Rising Senior · Cross Creek High School /
-Fayetteville State University Early College · Fayetteville, NC
+Rising Senior · Cross Creek Early College High School /
+Fayetteville State University · Fayetteville, NC
 
 Intended major: B.S. Data Science
 Class of 2031
