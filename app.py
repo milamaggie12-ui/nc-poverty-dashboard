@@ -119,7 +119,6 @@ fig_map = px.choropleth(
     locations="fips",
     featureidkey="id",
     color="poverty_rate",
-    scope="usa",
     color_continuous_scale="Reds",       # Darker red = higher poverty
     hover_name="county",                 # Show county name on hover
     hover_data={"poverty_rate": ":.1f",  # Format hover values to 1 decimal

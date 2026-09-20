@@ -32,7 +32,6 @@ fig = px.choropleth(
     locations="fips",                  # FIPS code links each row to its county shape
     featureidkey="id",                 # matches top-level id field in GeoJSON (e.g. "37001")
     color="poverty_rate",              # Color encodes overall poverty rate
-    scope="usa",                       # Restricts base map to US
     color_continuous_scale="Reds",     # Light = low poverty, dark red = high poverty
     title="Poverty Rate Across North Carolina Counties",
 )
