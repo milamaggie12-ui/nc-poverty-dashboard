@@ -8,6 +8,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import json
 
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -15,6 +16,14 @@ st.set_page_config(
     page_icon="📊",
     layout="wide"
 )
+
+# ── GeoJSON loading ───────────────────────────────────────────────────────────
+@st.cache_data
+def load_geojson():
+    with open("data/counties.geojson") as f:
+        return json.load(f)
+
+counties_geojson = load_geojson()
 
 # ── Data loading ──────────────────────────────────────────────────────────────
 @st.cache_data
@@ -106,8 +115,9 @@ st.subheader("Poverty Rate by County")
 # Each county matched to its geographic shape via 5-digit FIPS code
 fig_map = px.choropleth(
     nc,
-    geojson="https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json",
+    geojson=counties_geojson,
     locations="fips",
+    featureidkey="id",
     color="poverty_rate",
     scope="usa",
     color_continuous_scale="Reds",       # Darker red = higher poverty

@@ -9,6 +9,14 @@
 import streamlit as st
 import plotly.express as px
 import pandas as pd
+import json
+
+@st.cache_data
+def load_geojson():
+    with open("data/counties.geojson") as f:
+        return json.load(f)
+
+counties_geojson = load_geojson()
 
 st.title("NC County Poverty Map")
 
@@ -20,8 +28,9 @@ nc = df  # Assign to nc for clarity
 # GeoJSON source: Plotly's hosted US county boundaries dataset
 fig = px.choropleth(
     nc,
-    geojson="https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json",
+    geojson=counties_geojson,
     locations="fips",                  # FIPS code links each row to its county shape
+    featureidkey="id",                 # matches top-level id field in GeoJSON (e.g. "37001")
     color="poverty_rate",              # Color encodes overall poverty rate
     scope="usa",                       # Restricts base map to US
     color_continuous_scale="Reds",     # Light = low poverty, dark red = high poverty
