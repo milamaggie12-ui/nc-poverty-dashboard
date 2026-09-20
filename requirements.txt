@@ -1,6 +1,6 @@
 pandas
-plotly
+plotly==6.9.0
 streamlit
 openpyxl
-requests        
-statsmodels     
+requests
+statsmodels
